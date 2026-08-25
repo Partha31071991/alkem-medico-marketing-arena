@@ -1,0 +1,4 @@
+Duplicate HTML IDs: NONE
+API syntax: PASS
+Inline JS syntax: PASS
+Admin seed recovery: PASS
