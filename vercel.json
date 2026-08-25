@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/challenge/:token",
+      "destination": "/?challenge=:token"
+    }
+  ]
+}
