@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'node:crypto';
 
 function b64decode(v){return Buffer.from(v,'base64url').toString('utf8')}
 function verify(token,secret){
@@ -25,7 +25,7 @@ async function command(args){
   let d;try{d=JSON.parse(text)}catch{d={result:text}};
   return d.result;
 }
-module.exports=async(req,res)=>{
+export default async function handler(req, res) {
   try{
     if(req.method==='GET'){
       const result=await command(['GET','alkem:demo_mode']);
