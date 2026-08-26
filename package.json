@@ -1,0 +1,1 @@
+{"name":"alkem-medico-marketing-arena","version":"18.0.0","private":true,"type":"module","scripts":{"dev":"vercel dev","start":"vercel dev"},"dependencies":{"bcryptjs":"^3.0.2","jsonwebtoken":"^9.0.2"}}

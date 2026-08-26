@@ -1,0 +1,1 @@
+v18 — REST-based Upstash connection, fast auth diagnostics, final live-login fix
