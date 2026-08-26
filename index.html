@@ -605,38 +605,47 @@ async function toggleDemoMode(){
 }
 function renderFeatures(){const box=document.getElementById('featureList');box.innerHTML=defaultFeatures.map(x=>`<div class="switchRow"><span>${x}</span><button class="switch ${features[x]?'on':''}" onclick="features['${x}']=!features['${x}'];save();renderFeatures()"><i></i></button></div>`).join('')}
 window.addEventListener('DOMContentLoaded', async () => {
+  window.addEventListener('DOMContentLoaded', async () => {
+
   renderFeatures();
   renderStats();
-  loadSavedTeaser();
 
+  // Login screen now exists in the DOM
   await loadDemoMode();
 
-  if (!requireSession()) {
+  loadSavedTeaser();
+
+  if(!requireSession()) {
     // Login screen remains visible
   } else {
+
     applyRoleAccess();
 
-    const role = String(session?.user?.role || '').toUpperCase();
+    const role = String(
+      session?.user?.role || 'PLAYER'
+    ).toUpperCase();
 
-    if (role === 'ADMIN') {
+    if(role === 'ADMIN') {
       updateDemoControlUI();
     }
 
-    if (['ADMIN', 'ABM', 'RM'].includes(role)) {
+    if(['ADMIN','ABM','RM'].includes(role)) {
       loadReports();
     }
   }
 
-  const urlChallenge = new URLSearchParams(location.search).get('challenge');
+  const urlChallenge =
+    new URLSearchParams(location.search).get('challenge');
 
-  if (urlChallenge) {
-    setTimeout(() => {
+  if(urlChallenge){
+    setTimeout(()=>{
       openGame('boxing');
       toast('🥊 Challenge link detected — sign in/accept to fight');
-    }, 500);
+    },500);
   }
+
 });
-</script>
+ </script>
 
 <div id="authGate" class="authGate">
  <div class="authCard">
