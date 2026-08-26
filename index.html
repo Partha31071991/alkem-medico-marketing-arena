@@ -267,9 +267,14 @@ function chooseRole(role){
   document.querySelectorAll('.roleBtn').forEach(b=>b.classList.toggle('active',b.dataset.role===role));
 }
 function showLogin(){
-  document.getElementById('authGate').style.display='flex';
+  const gate = document.getElementById('authGate');
+  if (gate) gate.style.display = 'flex';
 }
-function hideLogin(){document.getElementById('authGate').style.display='none';}
+
+function hideLogin(){
+  const gate = document.getElementById('authGate');
+  if (gate) gate.style.display = 'none';
+}
 function switchAccount(){logout();}
 function logout(){
   localStorage.removeItem('alkem_session');
@@ -599,12 +604,38 @@ async function toggleDemoMode(){
  try{const enabled=!demoModeEnabled; const r=await fetch('/api/demo-control',{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+(session.token||'')},body:JSON.stringify({enabled,token:session.token||''})}); const d=await r.json(); if(!r.ok)throw Error(d.error||'Demo control failed'); demoModeEnabled=!!d.enabled; updateDemoControlUI(); toast(d.enabled?'🎮 Public Demo Mode enabled':'🔒 Public Demo Mode disabled');}catch(e){toast(e.message||'Demo control failed')}
 }
 function renderFeatures(){const box=document.getElementById('featureList');box.innerHTML=defaultFeatures.map(x=>`<div class="switchRow"><span>${x}</span><button class="switch ${features[x]?'on':''}" onclick="features['${x}']=!features['${x}'];save();renderFeatures()"><i></i></button></div>`).join('')}
-renderFeatures();renderStats();loadSavedTeaser();
-loadDemoMode();
-if(!requireSession()){} else {applyRoleAccess(); if(String(session.user?.role||'').toUpperCase()==='ADMIN') updateDemoControlUI(); if(['ADMIN','ABM','RM'].includes(String(session.user?.role||'').toUpperCase())) loadReports();}
+window.addEventListener('DOMContentLoaded', async () => {
+  renderFeatures();
+  renderStats();
+  loadSavedTeaser();
 
-const urlChallenge=new URLSearchParams(location.search).get('challenge');
-if(urlChallenge){setTimeout(()=>{openGame('boxing');toast('🥊 Challenge link detected — sign in/accept to fight')},500)}
+  await loadDemoMode();
+
+  if (!requireSession()) {
+    // Login screen remains visible
+  } else {
+    applyRoleAccess();
+
+    const role = String(session?.user?.role || '').toUpperCase();
+
+    if (role === 'ADMIN') {
+      updateDemoControlUI();
+    }
+
+    if (['ADMIN', 'ABM', 'RM'].includes(role)) {
+      loadReports();
+    }
+  }
+
+  const urlChallenge = new URLSearchParams(location.search).get('challenge');
+
+  if (urlChallenge) {
+    setTimeout(() => {
+      openGame('boxing');
+      toast('🥊 Challenge link detected — sign in/accept to fight');
+    }, 500);
+  }
+});
 </script>
 
 <div id="authGate" class="authGate">
@@ -617,7 +648,9 @@ if(urlChallenge){setTimeout(()=>{openGame('boxing');toast('🥊 Challenge link d
    <button class="roleBtn" data-role="ABM" onclick="chooseRole('ABM')">👥 ABM</button>
    <button class="roleBtn" data-role="ADMIN" onclick="chooseRole('ADMIN')">⚙️ Admin</button>
   </div>
-  <div class="authHint">Use the Login ID issued by Admin. For demonstration, select a role and use the Demo Login below.</div>
+  <div class="authHint">
+Use the Login ID issued by Admin. Demo access is available only when enabled by Admin.
+</div>
   <div class="field"><label>Login ID / Email</label><input id="loginEmail" autocomplete="username" placeholder="firstname.lastname@ppp.com"></div>
   <div class="field" style="margin-top:10px"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter password"></div>
   <div class="cta" style="margin-top:14px"><button class="btn primary" id="loginBtn" onclick="doLogin()">Sign In</button><button id="demoEnterBtn" class="btn gold" style="display:none" onclick="openDemoChooser()">🎮 Enter Demo — No Login</button><button class="btn" onclick="openHelp()">Login Help</button></div>
