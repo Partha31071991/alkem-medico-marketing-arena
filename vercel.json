@@ -1,8 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
-    { "source": "/challenge/:token", "destination": "/?challenge=:token" },
-    { "source": "/backend/health", "destination": "/api/health" },
-    { "source": "/backend/:path*", "destination": "/api/index?path=:path*" }
-  ]
-}
