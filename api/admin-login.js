@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'node:crypto';
 
 function b64(v){return Buffer.from(v).toString('base64url')}
 function sign(payload, secret){
@@ -11,7 +11,7 @@ function safeEqual(a,b){
   return aa.length===bb.length && crypto.timingSafeEqual(aa,bb);
 }
 
-module.exports = async (req,res)=>{
+export default async function handler(req, res) {
   if(req.method==='OPTIONS'){res.setHeader('Access-Control-Allow-Origin','*');res.setHeader('Access-Control-Allow-Headers','content-type,authorization');return res.status(204).end()}
   if(req.method!=='POST') return res.status(405).json({error:'Method not allowed'});
   const {email,password}=req.body||{};
@@ -24,4 +24,4 @@ module.exports = async (req,res)=>{
   const now=Math.floor(Date.now()/1000);
   const token=sign({sub:adminEmail,role:'ADMIN',iat:now,exp:now+12*60*60},secret);
   return res.status(200).json({ok:true,token,user:{email:adminEmail,name:process.env.ADMIN_NAME||'Administrator',designation:'ADMIN',role:'ADMIN',hq:process.env.ADMIN_HQ||'Nagpur',team:process.env.ADMIN_TEAM||'Nagpur Region'}});
-};
+}
