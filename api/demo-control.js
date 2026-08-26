@@ -40,4 +40,4 @@ export default async function handler(req, res) {
     await command(['SET','alkem:demo_mode',enabled?'1':'0']);
     return res.status(200).json({ok:true,enabled});
   }catch(e){return res.status(500).json({error:e.message||'Demo control unavailable'});}
-};
+}
