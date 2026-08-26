@@ -242,11 +242,54 @@ let selectedRole = 'PLAYER';
 // Demo access is controlled by Admin on the server. No demo credentials are exposed.
 let demoModeEnabled=false;
 async function loadDemoMode(){
-  try{const r=await fetch('/api/demo-control'); const d=await r.json(); demoModeEnabled=!!d.enabled;
-    const b=document.getElementById('demoEnterBtn'); if(b) b.style.display=demoModeEnabled?'':'none';
-    const note=document.getElementById('demoGateNote'); if(note) note.textContent=demoModeEnabled?'Demo Mode is enabled by Admin — enter without login.':'Demo Mode is currently disabled by Admin.';
-    if(session?.user?.role==='ADMIN') updateDemoControlUI();
-  }catch(e){demoModeEnabled=false;}
+
+  try{
+
+    const r = await fetch('/api/demo-control', {
+      cache: 'no-store'
+    });
+
+    const d = await r.json();
+
+    demoModeEnabled = r.ok && d.enabled === true;
+
+    const button = document.getElementById('demoEnterBtn');
+    const note = document.getElementById('demoGateNote');
+
+    if(button){
+      button.style.display =
+        demoModeEnabled ? 'inline-flex' : 'none';
+    }
+
+    if(note){
+      note.textContent = demoModeEnabled
+        ? 'Demo Mode is enabled by Admin — no login required.'
+        : 'Demo Mode is currently disabled by Admin.';
+    }
+
+    if(
+      session &&
+      String(session.user?.role || '').toUpperCase() === 'ADMIN'
+    ){
+      updateDemoControlUI();
+    }
+
+  }catch(error){
+
+    console.error('Demo mode check failed:', error);
+
+    demoModeEnabled = false;
+
+    const button = document.getElementById('demoEnterBtn');
+    const note = document.getElementById('demoGateNote');
+
+    if(button) button.style.display = 'none';
+
+    if(note){
+      note.textContent =
+        'Demo Mode status could not be checked.';
+    }
+  }
 }
 function openDemoChooser(){
   if(!demoModeEnabled){toast('Demo Mode is currently disabled by Admin');return;}
